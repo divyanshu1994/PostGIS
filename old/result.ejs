@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This stylesheet contains specific styles for displaying the map
+         on this page. Replace it with your own styles as described in the
+         documentation:
+         https://developers.google.com/maps/documentation/javascript/tutorial -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  </head>
+  <body>
+        
+
+         <div class="container">
+ <h1>Welcome to WebGIS</h1>
+ <br>
+
+<!--<h2><%= type %>-->
+<% for(var i=0;i<map.length;i++)  {  %>
+
+<!--<h3>Feature <%= i %></h3>-->
+<% var feature=map[i];  %>
+<!--this is for point data
+<%= feature %> 
+
+   <!--this for loop is required for multipolygon data-->
+<!--<% for(var j=0;j<feature.length;j++)  { %>
+
+    <%= feature[j] %> <br>
+ 
+   
+<% }  %>-->
+
+
+<%  }  %>
+
+
+    <div style="width:100%;height:400px" id="map"></div>
+   <script>
+      function initMap() {
+
+       
+        // Create a map object and specify the DOM element for display.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat:  51.5622507, lng: -0.6887836},
+          scrollwheel: false,
+          zoom: 10
+        });
+   
+
+// add marker if data returned is point type   
+<% if(type=="Point")  {  %>
+        <% for(var i=0;i<map.length;i++)  {  
+ var feature=map[i];  
+    var crd=feature.toString().split(',');
+    var lat=crd[1];
+    var lon=crd[0];
+        %>
+
+ var myLatLng = {lat: <%= lat %>, lng: <%= lon %>};
+       console.log("Lat "+<%=lat %> +" Long "+<%=lon %>);
+ var marker = new google.maps.Marker({
+          position: myLatLng,
+          map: map,
+          title: 'Hello World!'
+        });
+       
+
+
+
+   <%   }
+   
+}  %>
+
+
+        }
+      
+
+    </script>
+
+  
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwyEhjv2fqbFCmqd4hUG9zoH0-qsV8E18&callback=initMap"
+    async defer></script>
+
+    </div>
+  </body>
+</html>
+

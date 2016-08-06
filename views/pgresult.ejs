@@ -1,0 +1,19 @@
+<% layout('layout') %>
+
+<h2> Table output </h2>
+<br>
+<table >
+<% for(var i=0;i<outputs.length;i++) { %>
+<th><%= outputs[i] %></th>
+    <% } %>
+<% for(var i=0;i<data.length;i++ ) { %>
+<tr>
+<% for(var j=0;j<outputs.length;j++ ) {  %>
+    <td> <%= data[i][outputs[j]] %> </td>
+
+    <% } %>
+
+    </tr>
+
+    <% } %>     
+    </table>
