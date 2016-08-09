@@ -1,0 +1,211 @@
+<% layout('layout')  %>
+ 
+ <% if(map)  {  %>
+<%var features= map.features  } %>
+
+<div class="row ">
+<div class="controller col-md-6 panel panel-info">
+    <div class="panel-heading">Controller</div>
+  <div class="panel-body">My controlller</div>
+  <!-----------------Controller ------------------------------->
+
+  <div class="panel panel-default">
+      <div class="panel-heading">DB and Table</div>
+      <div class="panel-body">
+        
+    <form id="builder" method="post" action="/getMapCols">
+      <input id="db" type="text" name="db" class="form-control" placeholder="Database" value="<%= db %>" required>
+      <br>
+      <input id="table" type="text" name="table" class="form-control" placeholder="Table" value="<%= table %>" required>
+     <br>
+    
+     <button value="submit" class="btn btn-primary" >Find Fields</button>
+      <br>
+
+      </form>
+      </div>
+    </div>
+
+
+    
+
+    <div class="panel panel-default">
+      <div class="panel-heading"><h4> SELECT </h4></div>
+      <div class="panel-body"> <div class="row">
+
+    <div class="col-md-4">
+      <select id="field_name" class="form-control">
+        <% if(fields) {  %>
+        <% for(var i=0;i<fields.length;i++) {  %>
+
+          <% if(fields[i].data_type=="USER-DEFINED") { %>
+          <option name="ST_X(<%= fields[i].column_name %>)" value="ST_X(<%= fields[i].column_name %>)"> Longitude </option>
+          <option name="ST_Y(<%= fields[i].column_name %>)" value="ST_Y(<%= fields[i].column_name %>)"> Latitude </option>
+          <% } else {  %>
+          <option  name="<%= fields[i].column_name %>" value="<%= fields[i].column_name %>"><%= fields[i].column_name %></option>
+          <% } }  } %>
+
+          <option name="count(*)" value="count(*)">count(*)</option>
+      </select>
+      </div>
+
+          <div class="col-md-4">
+      <input type="text" id="field_as" class="form-control" placeholder="AS">
+      </div>
+
+          <div class="col-md-4">
+      <button id="map_addClick" class="btn btn-primary" > Add Field </button>
+      </div>
+      </div>
+      
+      </div>
+    </div>
+     
+       
+       <label id="query"></label>
+        
+<br>
+      
+      <div class="panel panel-default">
+      <div class="panel-heading"><h4> CONDITIONS </h4></div>
+      <div class="panel-body"><div class="row">
+
+      <div class="col-md-3">
+          <select id="wh_field" class="form-control">
+        <% if(fields) {  %>
+        <% for(var i=0;i<fields.length;i++) {  %>
+
+          <% if(fields[i].data_type=="USER-DEFINED") { %>
+          <option name="ST_X(<%= fields[i].column_name %>)" value="ST_X(<%= fields[i].column_name %>)"> Longitude </option>
+          <option name="ST_Y(<%= fields[i].column_name %>)" value="ST_Y(<%= fields[i].column_name %>)"> Latitude </option>
+          <% } else {  %>
+          <option  name="<%= fields[i].column_name %>" value="<%= fields[i].column_name %>"><%= fields[i].column_name %></option>
+          <% } }  } %>
+
+          <option name="count(*)" value="count(*)">count(*)</option>
+      </select>
+      </div>
+
+            <div class="col-md-3">
+        <select id="wh_choose" class="form-control">
+          <option name="equal" value="equal" >Equal</option>
+          <option name="greater" value="greater" >Greater than</option>
+
+        </select>
+      </div>
+
+            <div class="col-md-3">
+        <input type="text" class="form-control" placeholder="Condition" id="wh_condition">
+      </div>
+
+      <div class="col-md-3">
+      <button id="map_conditionClick" class="btn btn-primary">Add Condition </button>
+     </div>
+
+     </div>
+     </div>
+    </div>
+
+
+       <label id="where"></label>
+
+     <br>
+ <input id="geom_field" type="text" name="geom_field" class="form-control" placeholder="Geom Field"  required>
+     <br>
+<button type="submit" class="btn btn-primary" id="map_makeFinal">Go</button>
+
+
+<!----------------- Controller ends ---------------------------------------->
+</div>
+<div class="map col-md-6 panel panel-info">
+    <div class="panel-heading">Map</div>
+    <div class="panel-body" style="width:100%;height:500px" id="map"></div>
+</div>
+</div>
+
+   <script>
+       var map;
+      function initMap() {
+
+       
+        // Create a map object and specify the DOM element for display.
+        map=new google.maps.Map(document.getElementById('map'), {
+          center: {lat:  28, lng: 77},
+          scrollwheel: true,
+                  animation: google.maps.Animation.DROP,
+          zoom: 8
+        });
+   
+
+// add marker if data returned is point type 
+<% if(features)  {  %>
+<% for (var i=0;i<features.length;i++) { %>
+
+    <% var geom=features[i].geometry ;
+       var the_geom=JSON.parse(geom) ;
+       var type= the_geom.type;
+       var coordinates=the_geom.coordinates
+       
+        %>
+     //   console.log(<%= coordinates %>);
+       <% if(type=="Point")  {   %>   // fro point
+       <% var coord=coordinates.toString().split(",");
+            var lat=coord[1];
+            var lon=coord[0];
+        %>
+        
+        var myLatLng = {lat: <%= lat %>, lng: <%= lon %>};
+       console.log("Lat "+<%=lat %> +" Long "+<%=lon %>);
+ var marker = new google.maps.Marker({
+          position: myLatLng,
+          map: map,
+          title: 'Hello World!'
+        });
+
+    <% }  %>   
+
+    <% if(type=="MultiPolygon")  {  %>
+var polycoords=[];
+      <%  var coords=coordinates[0][0];  %>
+
+       <% for(var j=0;j<coords.length;j++) {  %>
+       <% var c=coords[j].toString().split(",") ;
+          var p_lat=c[1]  ; var p_long=c[0];
+        %>
+          polycoords.push({
+            lat:<%= p_lat  %>,
+            lng:<%= p_long  %>
+          });
+
+    <%  } %>
+
+     var Polygons = new google.maps.Polygon({
+          paths: polycoords,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map:map
+        });
+      
+
+
+      <%  }   %>
+
+
+    <% }  } %>  
+ }
+      
+
+
+    </script>
+
+  
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwyEhjv2fqbFCmqd4hUG9zoH0-qsV8E18&callback=initMap"
+    async defer></script>
+    <script src="/js/map_controller.js"></script>
+    </div>
+  </body>
+</html>
+

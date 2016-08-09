@@ -5,8 +5,9 @@ var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var urlencoded=bodyParser.urlencoded({extended:true});
 var socket=require('socket.io');
-
+var util=require('util');
 var main_route=require('./routes/gis');
+
 
 var app= express();
 
@@ -18,25 +19,12 @@ app.use(urlencoded);
 app.use('/',main_route);
 
 
-
 var server=app.listen(3000,function()
 {
     console.log("Listening to server");
 });
 
 
-
-
-
-// var io=socket(server);
-// io.on('connection',function (socket) {
-
-//     console.log('Socket connected');
-//     socket.on('disconnect',function(){
-//         console.log('Socket disconnected');
-//     });
-    
-// });
 
 app.get('/',function(req,res,next)
 {
@@ -51,3 +39,13 @@ app.get('/',function(req,res,next)
 });
  
 
+app.get('/map',function(req,res,next)
+{
+    res.render('pgmap',
+    {
+        map:'',
+        fields:'',
+        db:'',
+        table:''
+    });
+})

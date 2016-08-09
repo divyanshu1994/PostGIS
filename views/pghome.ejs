@@ -3,7 +3,8 @@
 
  <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#direct">Direct Query</a></li>
-    <li><a data-toggle="tab" href="#build">Build <Query></Query></a></li>
+    <li><a data-toggle="tab" href="#build">Build Query</a></li>
+    <li><a data-toggle="tab" href="#map">Map Query</a></li>
     <li><a data-toggle="tab" href="#complex">Complex Query</a></li>
   </ul>
 
@@ -11,6 +12,7 @@
 
 <div id="direct" class="tab-pane fade in active">
     <h2> Direct Query </h2><br>
+    
     <input type="text" id="direct_db" name="db" class="form-control" placeholder="Database" required><br>
      <input type="text" id="direct_query" name="q" class="form-control" placeholder="Query" required><br>
     <button id="direct_submit" class="btn btn-primary" >Submit</button>
@@ -76,7 +78,7 @@
        <label id="query"> SELECT </label>
         
 <br>
-     
+      
       <div class="panel panel-default">
       <div class="panel-heading"><h4> CONDITIONS </h4></div>
       <div class="panel-body"><div class="row">
@@ -118,7 +120,7 @@
     </div>
 
 
-       <label id="where"> WHERE </label>
+       <label id="where">WHERE</label>
 
      <br>
 
@@ -126,8 +128,135 @@
 
 </div>
 
+<div id="map" class="tab-pane fade in active">
+    <h2> MAP </h2><br>
+    
+    <input type="text" id="map_db" name="db" class="form-control" placeholder="Database" required><br>
+     <input type="text" id="map_query" name="q" class="form-control" placeholder="Query" required><br>
+    <button id="map_submit" class="btn btn-primary" >Submit</button>
+    </div>
+
+
 
 <div id="complex" class="tab-pane fade">
-<h1> Complex Queries </h1>
+
+
+<div id="div_distance">
+<h3> Distance </h3>
+<h4>Object 1 :</h4> 
+<br>
+<input class="form-control" type="text" id="table1" placeholder="Table 1">
+<br>
+<div class="panel panel-default">
+      <div class="panel-heading"><h4> CONDITIONS </h4></div>
+      <div class="panel-body"><div class="row">
+
+      <div class="col-md-3">
+          <select id="wh_field" class="form-control">
+        <% if(fields) {  %>
+        <% for(var i=0;i<fields.length;i++) {  %>
+
+          <% if(fields[i].data_type=="USER-DEFINED") { %>
+          <option name="ST_X(<%= fields[i].column_name %>)" value="ST_X(<%= fields[i].column_name %>)"> Longitude </option>
+          <option name="ST_Y(<%= fields[i].column_name %>)" value="ST_Y(<%= fields[i].column_name %>)"> Latitude </option>
+          <% } else {  %>
+          <option  name="<%= fields[i].column_name %>" value="<%= fields[i].column_name %>"><%= fields[i].column_name %></option>
+          <% } }  } %>
+
+          <option name="count(*)" value="count(*)">count(*)</option>
+      </select>
+      </div>
+
+            <div class="col-md-3">
+        <select id="wh_choose" class="form-control">
+          <option name="equal" value="equal" >Equal</option>
+          <option name="greater" value="greater" >Greater than</option>
+
+        </select>
+      </div>
+
+            <div class="col-md-3">
+        <input type="text" class="form-control" placeholder="Condition" id="wh_condition">
+      </div>
+
+      <div class="col-md-3">
+      <button id="conditionClick" class="btn btn-primary">Add Condition </button>
+     </div>
+
+     </div>
+     </div>
+    </div>
+
+
+       <label id="where"> WHERE </label>
+<br>
+<h4>Object 2:</h4>
+<br>
+<input class="form-control" type="text" id="table2" placeholder="Table 2">
+<br>
+<div class="panel panel-default">
+      <div class="panel-heading"><h4> CONDITIONS </h4></div>
+      <div class="panel-body"><div class="row">
+
+      <div class="col-md-3">
+          <select id="wh_field" class="form-control">
+        <% if(fields) {  %>
+        <% for(var i=0;i<fields.length;i++) {  %>
+
+          <% if(fields[i].data_type=="USER-DEFINED") { %>
+          <option name="ST_X(<%= fields[i].column_name %>)" value="ST_X(<%= fields[i].column_name %>)"> Longitude </option>
+          <option name="ST_Y(<%= fields[i].column_name %>)" value="ST_Y(<%= fields[i].column_name %>)"> Latitude </option>
+          <% } else {  %>
+          <option  name="<%= fields[i].column_name %>" value="<%= fields[i].column_name %>"><%= fields[i].column_name %></option>
+          <% } }  } %>
+
+          <option name="count(*)" value="count(*)">count(*)</option>
+      </select>
+      </div>
+
+            <div class="col-md-3">
+        <select id="wh_choose" class="form-control">
+          <option name="equal" value="equal" >Equal</option>
+          <option name="greater" value="greater" >Greater than</option>
+
+        </select>
+      </div>
+
+            <div class="col-md-3">
+        <input type="text" class="form-control" placeholder="Condition" id="wh_condition">
+      </div>
+
+      <div class="col-md-3">
+      <button id="conditionClick" class="btn btn-primary">Add Condition </button>
+     </div>
+
+     </div>
+     </div>
+    </div>
+
+
+       <label id="where"> WHERE </label>
+<br>
+<button id="distance_query">Find</button>
+</div>
+
+
+
+<div id="div_dwithin">
+<h3> Distance Within </h3>
+Object 1 : 
+<br>
+<input type="text" id="dw_table1" placeholder="Table 1">
+<input type="text" id="dw_info1" plcaholder="where clause">
+<br>
+Object 2:
+<br>
+<input type="text" id="dw_table2" placeholder="Table 2">
+<input type="text" id="dw_info2" plcaholder="where clause">
+<br>
+<button id="dwithin_query">Find</button>
+</div>
+
+
   </div>
 </div>

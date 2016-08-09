@@ -2,40 +2,33 @@ $(document).ready(function()
 {
 //var socket=io();
 
-$("#addClick").click(function()
+$("#map_addClick").click(function()
 {
     var query=$("#query");
     var field=$("#field_name").val();
     var as=$("#field_as").val();
  
-    if(query.html().length==8)
-    {
-    query.append(" "+field);
+    
+    query.append(""+field+" , ");
     if(as!=0)
     {
         query.append(" AS "+as);
     }
-    }
-    else{
-    query.append(", "+field);
-    if(as!=0)
-    {
-        query.append(" AS "+as);
-    }
-    }
+    
+ 
 });
-$("#conditionClick").click(function()
+$("#map_conditionClick").click(function()
 {
     var where=$("#where");
     var wh_field=$("#wh_field").val();
     var wh_choose=$("#wh_choose").val();
     var wh_condition=$("#wh_condition").val();
 
-    if(where.html().equals("WHERE"))
+    if(where.html().length==0)
     {
         // first entry
 
-        where.append(" "+wh_field);
+        where.append(" WHERE "+wh_field);
 
         if(wh_choose=="equal")
             where.append("=");
@@ -60,20 +53,27 @@ $("#conditionClick").click(function()
 
 
 });
-$("#makeFinal").click(function()
+$("#map_makeFinal").click(function()
 {
+    var db=$("#db").val();
+    var table=$("#table").val();
     var query=$("#query").html();
     var from=" FROM "+$("#table").val();
+    var geom_field=$("#geom_field").val();
     var where=$("#where").html();
     
-    if(where=="WHERE")
+    if(where.length==0)
     {
-        where="";
+        where=1;
+    }
+    if(query.length==0)
+    {
+        query=1;
     }
 
     var q=query+from+where;
     alert(q);
-    window.location.href = "http://localhost:3000/showTable?q="+q;
+    window.location.href = "http://localhost:3000/api/"+db+"/"+table+"/"+geom_field+"/"+query+"/"+where;
 });
 
 

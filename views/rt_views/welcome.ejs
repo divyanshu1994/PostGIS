@@ -1,0 +1,97 @@
+<% layout('layout') %>
+
+Welcome 
+<label id="name" ><%= user %></label><br>
+Location : 
+<label id="lat" >Lat</label>
+<label id="lng" >Long</label>
+<br>
+Travelling in : <label id="district"> Distrcit </label>
+<br>
+<button id="move">Move</button>
+ <% if(map)  {  %>
+<%var features= map.features  } %>
+
+<div class="panel-body" style="width:100%;height:500px" id="map"></div>
+<script>
+       var map;
+       var marker;
+      function initMap() {
+
+       
+        // Create a map object and specify the DOM element for display.
+        map=new google.maps.Map(document.getElementById('map'), {
+          center: {lat:  28.6, lng: 77},
+          scrollwheel: true,
+          zoom: 10
+        });
+
+         marker = new google.maps.Marker({
+          animation: google.maps.Animation.DROP,
+          map: map,
+          icon:'/car.png',
+          title: 'Hello World!'
+        });
+
+        <% if(features)  {  %>
+<% for (var i=0;i<features.length;i++) { %>
+
+    <% var geom=features[i].geometry ;
+       var the_geom=JSON.parse(geom) ;
+       var type= the_geom.type;
+       var coordinates=the_geom.coordinates
+       
+        %>
+
+        
+    <% if(type=="MultiPolygon")  {  %>
+var polycoords=[];
+      <%  var coords=coordinates[0][0];  %>
+
+       <% for(var j=0;j<coords.length;j++) {  %>
+       <% var c=coords[j].toString().split(",") ;
+          var p_lat=c[1]  ; var p_long=c[0];
+        %>
+          polycoords.push({
+            lat:<%= p_lat  %>,
+            lng:<%= p_long  %>
+          });
+
+    <%  } %>
+
+     var Polygons = new google.maps.Polygon({
+          paths: polycoords,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map:map
+        });
+      
+
+
+      <%  }   %>
+
+      <% } }  %>
+
+      myLatlng = new google.maps.LatLng(28.6,77);
+        marker.setPosition(myLatlng);
+      }
+
+      function moveMarker(lat,long)
+      {
+        console.log("Moving marker !!!!!!!!!!!!!!!!!!!!!!!"+lat+"  "+long);
+        
+        myLatlng = new google.maps.LatLng(lat,long);
+        marker.setPosition(myLatlng);
+        
+       
+
+      }
+
+     </script>
+ <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwyEhjv2fqbFCmqd4hUG9zoH0-qsV8E18&callback=initMap"
+    async defer></script>
+
+                         <script src="/js/rt.js"></script>

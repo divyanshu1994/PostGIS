@@ -71,6 +71,10 @@ PgApp.prototype.showTable =function (db,quer,callback)
         {
             outputs[i]="st_y";
         }
+        if(outputs[i].indexOf("st_distance")!=-1)
+        {
+            outputs[i]="st_distance";
+        }
     }
 
   
@@ -111,6 +115,60 @@ var conString=this.authString+db;
 
 }
 
+PgApp.prototype.api_map=function(db,quer,callback)
+{
+
+    var conString=this.authString+db;
+    pg.connect(conString, function(err, client, done){
+     // handle err here
+       if(err)
+          {  console.log("Error : "+err);
+
+              return callback({
+                err:err
+              });
+          }
+
+          else{
+
+     client.query(quer, function(err, result) {
+          // handle err here
+        if(err)
+          {
+              console.log("Error : "+err);
+              return callback({
+                err:err
+              });
+          }
+
+            console.log("success");
+           //console.log(result.rows);
+
+           var geojson={
+               "type": "FeatureCollection",
+                "features": []
+           }
+
+           function Obj(){
+                type= "Feature",
+                properties= {}
+                
+                
+           }
+           for(var i=0;i<result.rows.length;i++)
+           {
+            var obj=new Obj();
+               obj.geometry=result.rows[i].geomtry;
+               geojson.features.push(obj);
+           }
+              callback({data:geojson});
+
+            done(); // don't forget this to have the client returned to the pool
+     });
+    }
+});
+}
+
 PgApp.prototype.getCols=function(db,tbl_name,callback)
 {
     var conString=this.authString+db;
@@ -130,14 +188,14 @@ pg.connect(conString, function(err, client, done){
       function(err, result) {
           // handle err here
           if(err)
-          {              console.log("Error : "+err);
+          {   console.log("Error : "+err);
 
               return callback({
                 err:err
               });
           }
             console.log("success");
-            // console.log(result.rows);
+                 console.log(result.rows);
 
             callback({data:result.rows});
             done(); // don't forget this to have the client returned to the pool
@@ -145,6 +203,37 @@ pg.connect(conString, function(err, client, done){
 }
 });
 
+}
+
+function getGeoJSON(rows)
+{
+    
+    var obj, i;
+
+    obj = {
+      type: "FeatureCollection",
+      features: []
+    };
+
+    console.log("In getgeojson");
+
+    for (i = 0; i < rows.length; i++) {
+      var item, feature, geometry;
+      item = rows[i];
+
+      geometry = JSON.parse(item.geometry);
+      delete item.geometry;
+
+      feature = {
+        type: "Feature",
+        properties: item,
+        geometry: geometry
+      }
+
+      obj.features.push(feature);
+    } 
+    return obj;
+  
 }
 
 
