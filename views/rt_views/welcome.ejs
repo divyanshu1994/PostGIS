@@ -26,10 +26,17 @@ Travelling in : <label id="district"> Distrcit </label>
           zoom: 10
         });
 
+        var icon = {
+        url: "/circle.ico", // url
+        scaledSize: new google.maps.Size(70, 70), // scaled size
+        origin: new google.maps.Point(0,0), // origin
+        anchor: new google.maps.Point(35, 70) // anchor
+        };
+
          marker = new google.maps.Marker({
-          animation: google.maps.Animation.DROP,
+          
           map: map,
-          icon:'/car.png',
+          icon:icon,
           title: 'Hello World!'
         });
 
@@ -85,10 +92,7 @@ var polycoords=[];
         
         myLatlng = new google.maps.LatLng(lat,long);
         marker.setPosition(myLatlng);
-        
-       
-
-      }
+        }
 
      </script>
  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwyEhjv2fqbFCmqd4hUG9zoH0-qsV8E18&callback=initMap"
