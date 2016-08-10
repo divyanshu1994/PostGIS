@@ -144,8 +144,9 @@ console.log(query);
                         console.log("District : "+district);
                     }
                     else{
-                        district="No"
+                        district="Outer region"
                     }
+                    
                     callback({
                         district:district
                     });

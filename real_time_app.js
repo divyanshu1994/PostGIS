@@ -176,7 +176,7 @@ socket.on('update_intersection',function(name)
     console.log("Updating intersection");
 
   PgService.getIntersection(name,function (obj) {
-        
+        console.log("District is "+obj.district);
         io.emit('district',obj.district);
     });
 });
