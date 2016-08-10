@@ -12,7 +12,7 @@ var name=$("#name").html();
      var lat_long=long+" "+lat;
      console.log("Emmiting "+lat_long+" for "+name);
      socket.emit('change',{name:name,lat_long:lat_long});
-  },2000);
+  },1000);
 
 
 

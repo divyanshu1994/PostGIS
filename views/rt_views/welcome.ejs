@@ -86,14 +86,53 @@ var polycoords=[];
         marker.setPosition(myLatlng);
       }
 
+      var prevlat=28.6;
+      var prevlong=77;
+      var frames=[];
+
+      function makeFrames(lat,long)
+      {
+        for(var p=0;p<1;p+=0.01)
+        {
+          lt=prevlat+p*(lat-prevlat);
+          lon=prevlong+p*(long-prevlong);
+
+          mygeo = new google.maps.LatLng(lt,lon);
+
+          frames.push(mygeo);
+
+        }
+      }
       function moveMarker(lat,long)
       {
         console.log("Moving marker !!!!!!!!!!!!!!!!!!!!!!!"+lat+"  "+long);
-        
-        myLatlng = new google.maps.LatLng(lat,long);
-        marker.setPosition(myLatlng);
+
+        makeFrames(lat,long);
+        animate(marker,frames,0,20);
+
+        prevlat=lat;
+        prevlong=long;
+        frames=[];
+        // myLatlng = new google.maps.LatLng(lat,long);
+        // marker.setPosition(myLatlng);
         }
 
+        function animate(marker,frames,index,delay)
+        {
+            marker.setPosition(frames[index]);
+
+            if(index!=frames.length-1)
+            {
+            setTimeout(function(){
+              index=index+1;
+              animate(marker,frames,index,delay)
+            });
+            }
+            else
+            {
+              return;
+            }
+        }
      </script>
  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwyEhjv2fqbFCmqd4hUG9zoH0-qsV8E18&callback=initMap"
     async defer></script>
