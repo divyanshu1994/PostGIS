@@ -38,6 +38,7 @@ setInterval(function()
 {
     console.log("Updating "+name);
 
+    socket.emit('update_intersection',name);
 },1000);
 
 
