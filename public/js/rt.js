@@ -4,20 +4,52 @@ var socket=io("http://localhost:3000");
 var lat;
 var long;
 var name=$("#name").html();
+var distance=$("#nearby_distance").val();
 socket.emit('update_map',name);
 
-
-
- setInterval(function(){ 
-     var sign=Math.random()<0.5?1:-1;
-     lat+=Math.random()/100*sign;
-     long+=Math.random()/100*sign;
+$("#up").mousedown(function()
+{
+    lat+=0.02;
      var lat_long=long+" "+lat;
      console.log("Emmiting "+name+"    "+lat_long+" for "+name);
      socket.emit('change',{name:name,lat_long:lat_long});
-  },1000);
+});
+$("#down").mousedown(function()
+{
+    lat-=0.02;
+     var lat_long=long+" "+lat;
+     console.log("Emmiting "+name+"    "+lat_long+" for "+name);
+     socket.emit('change',{name:name,lat_long:lat_long});
+});
+$("#left").mousedown(function()
+{
+    long-=0.02;
+     var lat_long=long+" "+lat;
+     console.log("Emmiting "+name+"    "+lat_long+" for "+name);
+     socket.emit('change',{name:name,lat_long:lat_long});
+});
+$("#right").mousedown(function()
+{
+    long+=0.02;
+     var lat_long=long+" "+lat;
+     console.log("Emmiting "+name+"    "+lat_long+" for "+name);
+     socket.emit('change',{name:name,lat_long:lat_long});
+});
 
+// To simulate random movement
+//  setInterval(function(){ 
+//      var sign=Math.random()<0.5?1:-1;
+//      lat+=Math.random()/100*sign;
+//      long+=Math.random()/100*sign;
+//      var lat_long=long+" "+lat;
+//      console.log("Emmiting "+name+"    "+lat_long+" for "+name);
+//      socket.emit('change',{name:name,lat_long:lat_long});
+//   },1000);
 
+$("#set_nearby").click(function()
+{
+ distance=$("#nearby_distance").val();
+}); 
 
 socket.emit('server',"How are u server?");
 
@@ -36,7 +68,7 @@ setInterval(function()
 
     socket.emit('update_map',name);
     socket.emit('update_intersection',name);
-    socket.emit('update_nearby',name);
+    socket.emit('update_nearby',{name:name,distance:distance});
 },500);
 
 

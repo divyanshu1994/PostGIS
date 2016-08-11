@@ -85,14 +85,13 @@ app.post('/rt/update',function(req,res,next)
 
 app.get('/rt/welcome/:user',function(req,res,next)
 {
-
 // load all static content into the map
 // load delhi map on the map
 var mapData;
 async.waterfall([
     function(callback)
     {
-        PgApp.api_map("Delhi","SELECT  (ST_AsGeoJSON(geom)) as geomtry from wards_delimited",function(obj)
+        PgApp.api_map("Delhi","SELECT  (ST_AsGeoJSON(geom)) as geomtry from districts",function(obj)
         {
             if(obj.err)
             {
@@ -228,11 +227,11 @@ socket.on('update_intersection',function(name)
     });
 });
 
-socket.on('update_nearby',function(name)
+socket.on('update_nearby',function(data)
 {
-    console.log("Updating nearby");
-var query="SELECT i.name AS name, ST_Distance(i.geom, real.geom) *69 AS distance FROM important AS i INNER JOIN rt AS real ON(ST_DWithin(i.geom, real.geom, (20.00/69))) WHERE real.name='"+name+"'";
-
+   
+var query="SELECT i.name AS name, ST_Distance(i.geom, real.geom) *69 AS distance FROM important AS i INNER JOIN rt AS real ON(ST_DWithin(i.geom, real.geom, ("+data.distance+".00/69))) WHERE real.name='"+data.name+"'";
+ console.log("Updating nearby with "+query);
 PgApp.showTable("Delhi",query,function(obj)
 {   
     if(obj.data)
@@ -241,7 +240,7 @@ PgApp.showTable("Delhi",query,function(obj)
     io.emit('nearby',{
         nearbys:obj.data,
         outputs:obj.outputs,
-        name:name
+        name:data.name
     });
     }
 });
