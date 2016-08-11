@@ -6,6 +6,7 @@ var bodyParser=require('body-parser');
 var urlencoded=bodyParser.urlencoded({extended:true});
 var socket=require('socket.io');
 var util=require('util');
+var async=require('async');
 
 var app= express();
 var pg_service=require('./real-time/rt_pgservice');
@@ -85,28 +86,70 @@ app.post('/rt/update',function(req,res,next)
 app.get('/rt/welcome/:user',function(req,res,next)
 {
 
-PgApp.api_map("Delhi","SELECT  (ST_AsGeoJSON(geom)) as geomtry from districts",function(obj)
-{
-    if(obj.err)
+// load all static content into the map
+// load delhi map on the map
+var mapData;
+async.waterfall([
+    function(callback)
     {
-        console.log("E "+obj.err);
-       return res.render('error',{
+        PgApp.api_map("Delhi","SELECT  (ST_AsGeoJSON(geom)) as geomtry from wards_delimited",function(obj)
+        {
+            if(obj.err)
+            {
+                console.log("E "+obj.err);
+                return res.render('error',{
             err:obj.err
-        })
-    }
+            })
+        }
 
         var data=obj.data;
      //   data=JSON.parse(data);
 
-   console.log(data);
+            console.log(data);
+            var mapItems=[];
+            mapItems.push(data);
 
-     res.render('rt_views/welcome',
-     {
-         map:data,
-         user:req.params.user
-    });
+            callback(null,mapItems);
+   
   
 });
+    }
+    ,function(mapItems,callback)
+    {
+        PgApp.api_map("Delhi","SELECT  (ST_AsGeoJSON(geom)) as geomtry from important",function(obj)
+        {
+            if(obj.err)
+            {
+                console.log("E "+obj.err);
+                return res.render('error',{
+            err:obj.err
+            })
+        }
+
+        var data=obj.data;
+     //   data=JSON.parse(data);
+
+            console.log(data);
+
+            mapItems.push(data);
+
+            callback(null,mapItems);
+   
+  
+});
+    }
+    
+    ,function(data,callback)
+    {
+        res.render('rt_views/welcome',
+        {
+             mapItems:data,
+            user:req.params.user
+        });
+    }
+]);
+
+  
 
 });
 
@@ -165,7 +208,8 @@ socket.on('update_map',function(name)
         
         io.emit('updated',{
             lat:obj.lat,
-            long:obj.long
+            long:obj.long,
+            name:name
         });
     });
 
@@ -177,8 +221,33 @@ socket.on('update_intersection',function(name)
 
   PgService.getIntersection(name,function (obj) {
         console.log("District is "+obj.district);
-        io.emit('district',obj.district);
+        io.emit('district',{
+            district:obj.district,
+            name:name
+        });
     });
+});
+
+socket.on('update_nearby',function(name)
+{
+    console.log("Updating nearby");
+var query="SELECT i.name AS name, ST_Distance(i.geom, real.geom) *69 AS distance FROM important AS i INNER JOIN rt AS real ON(ST_DWithin(i.geom, real.geom, (20.00/69))) WHERE real.name='"+name+"'";
+
+PgApp.showTable("Delhi",query,function(obj)
+{   
+    if(obj.data)
+    {
+    console.log("Number of nearby : "+obj.data.length);
+    io.emit('nearby',{
+        nearbys:obj.data,
+        outputs:obj.outputs,
+        name:name
+    });
+    }
+});
+
+
+
 });
 
 
